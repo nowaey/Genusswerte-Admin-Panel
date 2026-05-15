@@ -37,7 +37,7 @@ export function useRedemptionDetail(id: string | undefined) {
       .select('*, vouchers(id, code, product_name, variant, persons_allowed)')
       .eq('id', id)
       .single()
-    setRedemption(data as RedemptionWithVoucher)
+    setRedemption(data as unknown as RedemptionWithVoucher)
     setLoading(false)
   }
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
-import type { RevenueSummary, RevenueByCategory, OrderWithCustomer } from '@/hooks/useOrders'
+import type { RevenueSummary, RevenueByCategory } from '@/types/database'
+import type { OrderWithCustomer } from '@/hooks/useOrders'
 import StatusBadge from '@/components/shared/StatusBadge'
 import { ORDER_TYPE_LABELS } from '@/lib/products'
 

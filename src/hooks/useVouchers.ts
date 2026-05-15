@@ -41,7 +41,7 @@ export function useVoucherDetail(id: string | undefined) {
       .select('*, orders(id, payment_status, internal_ref), redemption_requests(*)')
       .eq('id', id)
       .single()
-    setVoucher(data as VoucherDetail)
+    setVoucher(data as unknown as VoucherDetail)
     setLoading(false)
   }
 
