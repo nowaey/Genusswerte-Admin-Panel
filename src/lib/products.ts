@@ -67,6 +67,20 @@ export const SOURCE_LABELS: Record<string, string> = {
   manual:     'Manuell',
 }
 
+// ─── Tasting Prices ───────────────────────────────────────────────────────────
+// Price per person in euros. Used by the Stripe checkout flow.
+
+export const TASTING_PRICES: Record<string, number> = {
+  'Wein Tasting':              29,
+  'Afterwork Wein Tasting':    19,
+  'Gin Tasting':               45,
+  'Champagner & Popcorn':      39,
+  'Trüffel & Champagner':      66,
+  'Craft Beer Tasting':        25,
+  'Wagyu-Burger & Champagner': 55,
+  'Apéro & Antipasti':         29,
+}
+
 // ─── Voucher Code Generation ──────────────────────────────────────────────────
 // Characters: no 0, O, 1, I, L — avoids misreading when spoken or handwritten.
 

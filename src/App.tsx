@@ -14,6 +14,7 @@ import RedemptionNew from '@/pages/RedemptionNew'
 import RedemptionDetail from '@/pages/RedemptionDetail'
 import Customers from '@/pages/Customers'
 import CustomerDetail from '@/pages/CustomerDetail'
+import StripeTest from '@/pages/StripeTest'
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="redemptions/:id"      element={<RedemptionDetail />} />
             <Route path="customers"            element={<Customers />} />
             <Route path="customers/:id"        element={<CustomerDetail />} />
+            <Route path="stripe-test"          element={<StripeTest />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
