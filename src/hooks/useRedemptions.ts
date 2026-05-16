@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import type { RedemptionRequest, Voucher } from '@/types/database'
 
 export type RedemptionWithVoucher = RedemptionRequest & {
-  vouchers: Pick<Voucher, 'id' | 'code' | 'product_name' | 'variant' | 'persons_allowed'> | null
+  vouchers: Pick<Voucher, 'id' | 'code' | 'voucher_type' | 'product_name' | 'variant' | 'persons_allowed'> | null
 }
 
 export function useRedemptions() {
@@ -14,7 +14,7 @@ export function useRedemptions() {
     setLoading(true)
     const { data } = await supabase
       .from('redemption_requests')
-      .select('*, vouchers(id, code, product_name, variant, persons_allowed)')
+      .select('*, vouchers(id, code, voucher_type, product_name, variant, persons_allowed)')
       .order('status')
       .order('created_at', { ascending: false })
     setRedemptions((data ?? []) as RedemptionWithVoucher[])
@@ -34,7 +34,7 @@ export function useRedemptionDetail(id: string | undefined) {
     setLoading(true)
     const { data } = await supabase
       .from('redemption_requests')
-      .select('*, vouchers(id, code, product_name, variant, persons_allowed)')
+      .select('*, vouchers(id, code, voucher_type, product_name, variant, persons_allowed)')
       .eq('id', id)
       .single()
     setRedemption(data as unknown as RedemptionWithVoucher)

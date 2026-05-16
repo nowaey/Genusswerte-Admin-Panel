@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useRedemptionDetail } from '@/hooks/useRedemptions'
@@ -7,6 +7,7 @@ import StatusBadge from '@/components/shared/StatusBadge'
 import InternalNotes from '@/components/shared/InternalNotes'
 import { scheduleForTasting } from '@/lib/products'
 import type { RedemptionStatus } from '@/types/database'
+import type { TastingEventWithCapacity } from '@/hooks/useTastings'
 
 export default function RedemptionDetail() {
   const { id } = useParams<{ id: string }>()
@@ -15,6 +16,36 @@ export default function RedemptionDetail() {
   const [confirmedTime, setConfirmedTime] = useState('')
   const [showConfirmForm, setShowConfirmForm] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  // Termin-Zuordnung
+  const [availableEvents, setAvailableEvents] = useState<TastingEventWithCapacity[]>([])
+  const [selectedEventId, setSelectedEventId] = useState('')
+  const [assigning, setAssigning] = useState(false)
+  const [assignError, setAssignError] = useState<string | null>(null)
+
+  // Load available tasting events for this voucher's product
+  useEffect(() => {
+    if (!redemption || redemption.vouchers?.voucher_type !== 'tasting_voucher') return
+    const productName = redemption.vouchers!.product_name
+    const today = new Date().toISOString().slice(0, 10)
+    supabase
+      .from('tasting_events')
+      .select('*, tasting_bookings(persons, status)')
+      .eq('tasting_name', productName)
+      .eq('is_open', true)
+      .gte('event_date', today)
+      .order('event_date')
+      .order('start_time')
+      .then(({ data }) => {
+        const enriched = ((data ?? []) as (ReturnType<typeof Object.assign>)[]).map((e) => {
+          const own_booked = (e.tasting_bookings as { persons: number; status: string }[])
+            .filter(b => b.status === 'confirmed')
+            .reduce((sum: number, b: { persons: number }) => sum + b.persons, 0)
+          return { ...e, own_booked, own_available: e.own_quota - own_booked }
+        })
+        setAvailableEvents(enriched as TastingEventWithCapacity[])
+      })
+  }, [redemption?.id, redemption?.tasting_event_id])
 
   if (loading) return <p className="text-sm text-muted-foreground p-6">Laden...</p>
   if (!redemption) return <p className="text-sm text-destructive p-6">Einlösungsanfrage nicht gefunden.</p>
@@ -36,6 +67,56 @@ export default function RedemptionDetail() {
     const dt = confirmedTime ? `${confirmedDate}T${confirmedTime}:00` : `${confirmedDate}T00:00:00`
     await setStatus('date_confirmed', { confirmed_date: dt })
     setShowConfirmForm(false)
+  }
+
+  async function assignEvent() {
+    if (!selectedEventId || !v) return
+    setAssignError(null)
+    setAssigning(true)
+
+    const ev = availableEvents.find(e => e.id === selectedEventId)
+    if (!ev) { setAssignError('Termin nicht gefunden'); setAssigning(false); return }
+
+    const persons = redemption!.requested_persons
+    if (persons > ev.own_available) {
+      setAssignError(`Nur ${ev.own_available} Platz/Plätze verfügbar`)
+      setAssigning(false)
+      return
+    }
+
+    // 1. Tasting-Buchung anlegen
+    const { data: booking, error: bookingErr } = await supabase
+      .from('tasting_bookings')
+      .insert({
+        tasting_event_id:      ev.id,
+        voucher_id:            v.id,
+        redemption_request_id: redemption!.id,
+        booking_type:          'voucher_redemption',
+        customer_name:         redemption!.customer_name,
+        customer_email:        redemption!.customer_email,
+        customer_phone:        redemption!.customer_phone,
+        persons,
+      })
+      .select('id')
+      .single()
+
+    if (bookingErr || !booking) { setAssignError(bookingErr?.message ?? 'Buchung fehlgeschlagen'); setAssigning(false); return }
+
+    // 2. Einlösungsanfrage + Voucher aktualisieren
+    const eventDt = `${ev.event_date}T${ev.start_time}`
+    await Promise.all([
+      supabase.from('redemption_requests').update({
+        tasting_event_id:   ev.id,
+        tasting_booking_id: booking.id,
+        status:             'date_confirmed',
+        confirmed_date:     eventDt,
+      }).eq('id', redemption!.id),
+      supabase.from('vouchers').update({ status: 'date_confirmed' }).eq('id', v.id),
+    ])
+
+    setAssigning(false)
+    setSelectedEventId('')
+    reload()
   }
 
   const schedule = v ? scheduleForTasting(v.product_name) : ''
@@ -139,6 +220,57 @@ export default function RedemptionDetail() {
           </div>
         )}
       </div>
+
+      {/* Termin zuordnen (nur für Tasting-Gutscheine) */}
+      {v?.voucher_type === 'tasting_voucher' && (
+        <div className="bg-white rounded-lg border border-border p-6">
+          <h2 className="text-sm font-medium mb-3">Termin zuordnen</h2>
+
+          {redemption.tasting_event_id ? (
+            <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded px-3 py-2 flex items-center justify-between">
+              <span>Termin bereits zugeordnet</span>
+              <Link to={`/tastings/${redemption.tasting_event_id}`} className="text-primary hover:underline text-xs">
+                Termin öffnen →
+              </Link>
+            </div>
+          ) : (
+            <>
+              {availableEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Keine offenen Termine für {v.product_name} verfügbar.</p>
+              ) : (
+                <div className="space-y-3">
+                  <select
+                    value={selectedEventId}
+                    onChange={e => setSelectedEventId(e.target.value)}
+                    className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">— Termin wählen —</option>
+                    {availableEvents.map(e => (
+                      <option
+                        key={e.id}
+                        value={e.id}
+                        disabled={e.own_available < redemption.requested_persons}
+                      >
+                        {new Date(e.event_date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })} · {e.start_time.slice(0, 5)} Uhr
+                        {' '}— {e.own_available} Platz/Plätze frei
+                        {e.own_available < redemption.requested_persons ? ' (zu wenig)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {assignError && <p className="text-xs text-destructive">{assignError}</p>}
+                  <button
+                    onClick={assignEvent}
+                    disabled={!selectedEventId || assigning}
+                    className="bg-primary text-primary-foreground px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                  >
+                    {assigning ? 'Zuordnen...' : 'Termin bestätigen & Platz buchen'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Customer + preferred dates */}
       <div className="bg-white rounded-lg border border-border p-6 space-y-4">

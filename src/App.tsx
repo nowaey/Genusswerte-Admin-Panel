@@ -15,6 +15,11 @@ import RedemptionDetail from '@/pages/RedemptionDetail'
 import Customers from '@/pages/Customers'
 import CustomerDetail from '@/pages/CustomerDetail'
 import StripeTest from '@/pages/StripeTest'
+import Tastings from '@/pages/Tastings'
+import TastingNew from '@/pages/TastingNew'
+import TastingDetail from '@/pages/TastingDetail'
+import GroupRequests from '@/pages/GroupRequests'
+import GroupRequestDetail from '@/pages/GroupRequestDetail'
 
 export default function App() {
   return (
@@ -42,6 +47,11 @@ export default function App() {
             <Route path="customers"            element={<Customers />} />
             <Route path="customers/:id"        element={<CustomerDetail />} />
             <Route path="stripe-test"          element={<StripeTest />} />
+            <Route path="tastings"             element={<Tastings />} />
+            <Route path="tastings/new"         element={<TastingNew />} />
+            <Route path="tastings/:id"         element={<TastingDetail />} />
+            <Route path="group-requests"       element={<GroupRequests />} />
+            <Route path="group-requests/:id"   element={<GroupRequestDetail />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

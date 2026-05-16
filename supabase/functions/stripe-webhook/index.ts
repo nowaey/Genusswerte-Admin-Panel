@@ -28,13 +28,15 @@ Deno.serve(async (req) => {
     return new Response('Missing stripe-signature header', { status: 400 })
   }
 
+  // deno-lint-ignore no-explicit-any
   const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
-    apiVersion: '2024-11-20.acacia',
+    apiVersion: '2026-04-22.dahlia' as any,
   })
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(
+    // Deno requires the async variant — constructEvent uses SubtleCrypto which is async-only.
+    event = await stripe.webhooks.constructEventAsync(
       body,
       sig,
       Deno.env.get('STRIPE_WEBHOOK_SECRET')!,

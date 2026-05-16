@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
-import type { OrderStatus, PaymentStatus, VoucherStatus, RedemptionStatus } from '@/types/database'
+import type { OrderStatus, PaymentStatus, VoucherStatus, RedemptionStatus, BookingStatus, GroupRequestStatus } from '@/types/database'
 
-type AnyStatus = OrderStatus | PaymentStatus | VoucherStatus | RedemptionStatus
+type AnyStatus = OrderStatus | PaymentStatus | VoucherStatus | RedemptionStatus | BookingStatus | GroupRequestStatus
 
 const labels: Record<string, string> = {
   // order status
@@ -26,6 +26,11 @@ const labels: Record<string, string> = {
   under_review:         'In Prüfung',
   alternative_proposed: 'Alternative vorgeschlagen',
   rejected:             'Abgelehnt',
+  // group request status
+  new:                  'Neu',
+  reviewing:            'In Prüfung',
+  offer_sent:           'Angebot gesendet',
+  confirmed:            'Bestätigt',
 }
 
 const colors: Record<string, string> = {
@@ -47,6 +52,11 @@ const colors: Record<string, string> = {
   refunded:             'bg-red-50 text-red-600 border-red-200',
   expired:              'bg-red-50 text-red-600 border-red-200',
   rejected:             'bg-red-50 text-red-600 border-red-200',
+  // group request / booking
+  new:                  'bg-blue-50 text-blue-700 border-blue-200',
+  reviewing:            'bg-amber-50 text-amber-700 border-amber-200',
+  offer_sent:           'bg-violet-50 text-violet-700 border-violet-200',
+  confirmed:            'bg-green-50 text-green-700 border-green-200',
 }
 
 export default function StatusBadge({ status, className }: { status: AnyStatus; className?: string }) {

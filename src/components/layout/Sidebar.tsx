@@ -7,15 +7,19 @@ import {
   Ticket,
   CalendarCheck,
   Users,
+  CalendarDays,
+  UsersRound,
   LogOut,
 } from 'lucide-react'
 
 const nav = [
-  { to: '/',            label: 'Dashboard',    icon: LayoutDashboard },
-  { to: '/orders',      label: 'Bestellungen', icon: ShoppingBag },
-  { to: '/vouchers',    label: 'Gutscheine',   icon: Ticket },
-  { to: '/redemptions', label: 'Einlösungen',  icon: CalendarCheck },
-  { to: '/customers',   label: 'Kunden',       icon: Users },
+  { to: '/',               label: 'Dashboard',       icon: LayoutDashboard },
+  { to: '/orders',         label: 'Bestellungen',    icon: ShoppingBag },
+  { to: '/vouchers',       label: 'Gutscheine',      icon: Ticket },
+  { to: '/redemptions',    label: 'Einlösungen',     icon: CalendarCheck },
+  { to: '/tastings',       label: 'Termine',         icon: CalendarDays },
+  { to: '/group-requests', label: 'Gruppenanfragen', icon: UsersRound },
+  { to: '/customers',      label: 'Kunden',          icon: Users },
 ]
 
 export default function Sidebar() {

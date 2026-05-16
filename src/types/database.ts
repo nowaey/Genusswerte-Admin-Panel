@@ -5,12 +5,15 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-export type OrderType = 'tasting_voucher' | 'value_voucher' | 'gift_box' | 'mixed'
-export type OrderStatus = 'inquiry' | 'payment_open' | 'paid' | 'in_preparation' | 'ready' | 'completed' | 'cancelled' | 'refunded'
-export type PaymentStatus = 'open' | 'paid' | 'cancelled' | 'refunded'
-export type ProductType = 'tasting_voucher' | 'value_voucher' | 'gift_box'
-export type VoucherStatus = 'pending' | 'active' | 'redemption_requested' | 'date_confirmed' | 'redeemed' | 'expired' | 'cancelled'
-export type RedemptionStatus = 'pending' | 'under_review' | 'date_confirmed' | 'alternative_proposed' | 'completed' | 'rejected'
+export type OrderType           = 'tasting_voucher' | 'value_voucher' | 'gift_box' | 'mixed'
+export type OrderStatus         = 'inquiry' | 'payment_open' | 'paid' | 'in_preparation' | 'ready' | 'completed' | 'cancelled' | 'refunded'
+export type PaymentStatus       = 'open' | 'paid' | 'cancelled' | 'refunded'
+export type ProductType         = 'tasting_voucher' | 'value_voucher' | 'gift_box'
+export type VoucherStatus       = 'pending' | 'active' | 'redemption_requested' | 'date_confirmed' | 'redeemed' | 'expired' | 'cancelled'
+export type RedemptionStatus    = 'pending' | 'under_review' | 'date_confirmed' | 'alternative_proposed' | 'completed' | 'rejected'
+export type BookingType         = 'voucher_redemption' | 'in_store'
+export type BookingStatus       = 'confirmed' | 'cancelled'
+export type GroupRequestStatus  = 'new' | 'reviewing' | 'offer_sent' | 'confirmed' | 'rejected' | 'completed'
 
 // ─── Database shape (Supabase client generic) ─────────────────────────────────
 
@@ -55,6 +58,8 @@ export type Database = {
           internal_ref: string | null
           notes: string | null
           paid_at: string | null
+          stripe_session_id: string | null
+          stripe_payment_intent_id: string | null
           created_at: string
           updated_at: string
         }
@@ -69,6 +74,8 @@ export type Database = {
           internal_ref?: string | null
           notes?: string | null
           paid_at?: string | null
+          stripe_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -83,6 +90,8 @@ export type Database = {
           internal_ref?: string | null
           notes?: string | null
           paid_at?: string | null
+          stripe_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -191,6 +200,8 @@ export type Database = {
           status: RedemptionStatus
           confirmed_date: string | null
           admin_notes: string | null
+          tasting_event_id: string | null
+          tasting_booking_id: string | null
           created_at: string
           updated_at: string
         }
@@ -211,6 +222,8 @@ export type Database = {
           status?: RedemptionStatus
           confirmed_date?: string | null
           admin_notes?: string | null
+          tasting_event_id?: string | null
+          tasting_booking_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -231,6 +244,8 @@ export type Database = {
           status?: RedemptionStatus
           confirmed_date?: string | null
           admin_notes?: string | null
+          tasting_event_id?: string | null
+          tasting_booking_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -264,6 +279,141 @@ export type Database = {
           created_at?: string
         }
       }
+      tasting_events: {
+        Row: {
+          id: string
+          tasting_name: string
+          event_date: string
+          start_time: string
+          own_quota: number
+          franchise_quota: number
+          franchise_booked: number
+          is_open: boolean
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tasting_name: string
+          event_date: string
+          start_time: string
+          own_quota?: number
+          franchise_quota?: number
+          franchise_booked?: number
+          is_open?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tasting_name?: string
+          event_date?: string
+          start_time?: string
+          own_quota?: number
+          franchise_quota?: number
+          franchise_booked?: number
+          is_open?: boolean
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      tasting_bookings: {
+        Row: {
+          id: string
+          tasting_event_id: string
+          voucher_id: string | null
+          redemption_request_id: string | null
+          booking_type: BookingType
+          customer_name: string
+          customer_email: string | null
+          customer_phone: string | null
+          persons: number
+          status: BookingStatus
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tasting_event_id: string
+          voucher_id?: string | null
+          redemption_request_id?: string | null
+          booking_type: BookingType
+          customer_name: string
+          customer_email?: string | null
+          customer_phone?: string | null
+          persons: number
+          status?: BookingStatus
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tasting_event_id?: string
+          voucher_id?: string | null
+          redemption_request_id?: string | null
+          booking_type?: BookingType
+          customer_name?: string
+          customer_email?: string | null
+          customer_phone?: string | null
+          persons?: number
+          status?: BookingStatus
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      group_requests: {
+        Row: {
+          id: string
+          tasting_name: string
+          customer_name: string
+          customer_email: string
+          customer_phone: string | null
+          persons: number
+          desired_period: string | null
+          occasion: string | null
+          message: string | null
+          status: GroupRequestStatus
+          admin_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tasting_name: string
+          customer_name: string
+          customer_email: string
+          customer_phone?: string | null
+          persons: number
+          desired_period?: string | null
+          occasion?: string | null
+          message?: string | null
+          status?: GroupRequestStatus
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tasting_name?: string
+          customer_name?: string
+          customer_email?: string
+          customer_phone?: string | null
+          persons?: number
+          desired_period?: string | null
+          occasion?: string | null
+          message?: string | null
+          status?: GroupRequestStatus
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       revenue_summary: {
@@ -293,6 +443,9 @@ export type Database = {
       product_type: ProductType
       voucher_status: VoucherStatus
       redemption_status: RedemptionStatus
+      booking_type: BookingType
+      booking_status: BookingStatus
+      group_request_status: GroupRequestStatus
     }
   }
 }
@@ -321,6 +474,18 @@ export type RedemptionRequestUpdate = Database['public']['Tables']['redemption_r
 
 export type InternalNote       = Database['public']['Tables']['internal_notes']['Row']
 export type InternalNoteInsert = Database['public']['Tables']['internal_notes']['Insert']
+
+export type TastingEvent       = Database['public']['Tables']['tasting_events']['Row']
+export type TastingEventInsert = Database['public']['Tables']['tasting_events']['Insert']
+export type TastingEventUpdate = Database['public']['Tables']['tasting_events']['Update']
+
+export type TastingBooking       = Database['public']['Tables']['tasting_bookings']['Row']
+export type TastingBookingInsert = Database['public']['Tables']['tasting_bookings']['Insert']
+export type TastingBookingUpdate = Database['public']['Tables']['tasting_bookings']['Update']
+
+export type GroupRequest       = Database['public']['Tables']['group_requests']['Row']
+export type GroupRequestInsert = Database['public']['Tables']['group_requests']['Insert']
+export type GroupRequestUpdate = Database['public']['Tables']['group_requests']['Update']
 
 export type RevenueSummary     = Database['public']['Views']['revenue_summary']['Row']
 export type RevenueByCategory  = Database['public']['Views']['revenue_by_category']['Row']
