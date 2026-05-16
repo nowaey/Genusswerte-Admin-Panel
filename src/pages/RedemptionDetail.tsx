@@ -146,12 +146,6 @@ export default function RedemptionDetail() {
   const waLink = buildWhatsApp()
   const email = buildEmail()
 
-  const preferredDates = [
-    redemption.preferred_date_1 && { date: redemption.preferred_date_1, time: redemption.preferred_time_1 },
-    redemption.preferred_date_2 && { date: redemption.preferred_date_2, time: redemption.preferred_time_2 },
-    redemption.preferred_date_3 && { date: redemption.preferred_date_3, time: redemption.preferred_time_3 },
-  ].filter(Boolean) as { date: string; time: string | null }[]
-
   return (
     <div className="max-w-2xl space-y-6">
       <PageHeader
@@ -272,30 +266,15 @@ export default function RedemptionDetail() {
         </div>
       )}
 
-      {/* Customer + preferred dates */}
+      {/* Customer data */}
       <div className="bg-white rounded-lg border border-border p-6 space-y-4">
-        <h2 className="text-sm font-medium">Kundendaten & Wunschtermine</h2>
+        <h2 className="text-sm font-medium">Kundendaten</h2>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
           <InfoRow label="Name">{redemption.customer_name}</InfoRow>
           <InfoRow label="Personen">{redemption.requested_persons}</InfoRow>
           {redemption.customer_email && <InfoRow label="E-Mail">{redemption.customer_email}</InfoRow>}
           {redemption.customer_phone && <InfoRow label="Telefon">{redemption.customer_phone}</InfoRow>}
         </dl>
-
-        {preferredDates.length > 0 && (
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-2">Wunschtermine</p>
-            <ol className="space-y-1">
-              {preferredDates.map((d, i) => (
-                <li key={i} className="text-sm flex items-center gap-2">
-                  <span className="text-muted-foreground">{i + 1}.</span>
-                  <span>{new Date(d.date).toLocaleDateString('de-DE', { weekday:'short', day:'2-digit', month:'2-digit', year:'numeric' })}</span>
-                  {d.time && <span className="text-muted-foreground">{d.time} Uhr</span>}
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
 
         {redemption.message && (
           <div>

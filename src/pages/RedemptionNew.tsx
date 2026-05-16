@@ -10,20 +10,17 @@ export default function RedemptionNew() {
   const prefillVoucherId = params.get('voucherId') ?? ''
 
   const [voucherSearch, setVoucherSearch] = useState('')
-  const [voucher, setVoucher] = useState<Voucher | null>(null)
-  const [voucherError, setVoucherError] = useState<string | null>(null)
-  const [lookingUp, setLookingUp] = useState(false)
+  const [voucher, setVoucher]             = useState<Voucher | null>(null)
+  const [voucherError, setVoucherError]   = useState<string | null>(null)
+  const [lookingUp, setLookingUp]         = useState(false)
 
-  const [customerName, setCustomerName] = useState('')
-  const [customerEmail, setCustomerEmail] = useState('')
-  const [customerPhone, setCustomerPhone] = useState('')
+  const [customerName, setCustomerName]       = useState('')
+  const [customerEmail, setCustomerEmail]     = useState('')
+  const [customerPhone, setCustomerPhone]     = useState('')
   const [requestedPersons, setRequestedPersons] = useState(1)
-  const [date1, setDate1] = useState(''); const [time1, setTime1] = useState('')
-  const [date2, setDate2] = useState(''); const [time2, setTime2] = useState('')
-  const [date3, setDate3] = useState(''); const [time3, setTime3] = useState('')
-  const [message, setMessage] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage]                 = useState('')
+  const [saving, setSaving]                   = useState(false)
+  const [error, setError]                     = useState<string | null>(null)
 
   // Pre-fill if coming from voucher detail
   useEffect(() => {
@@ -65,15 +62,11 @@ export default function RedemptionNew() {
       customer_email:    customerEmail || null,
       customer_phone:    customerPhone || null,
       requested_persons: requestedPersons,
-      preferred_date_1:  date1 || null, preferred_time_1: time1 || null,
-      preferred_date_2:  date2 || null, preferred_time_2: time2 || null,
-      preferred_date_3:  date3 || null, preferred_time_3: time3 || null,
       message:           message || null,
     }).select().single()
 
     if (err) { setError(err.message); setSaving(false); return }
 
-    // Update voucher status
     await supabase.from('vouchers').update({ status: 'redemption_requested' }).eq('id', voucher.id)
     setSaving(false)
     navigate(`/redemptions/${data.id}`)
@@ -84,6 +77,7 @@ export default function RedemptionNew() {
       <PageHeader title="Einlösungsanfrage erfassen" back />
 
       <form onSubmit={handleSubmit} className="space-y-6">
+
         {/* Voucher lookup */}
         <div className="bg-white rounded-lg border border-border p-6 space-y-3">
           <h2 className="text-sm font-medium">Gutschein</h2>
@@ -96,7 +90,9 @@ export default function RedemptionNew() {
                   {voucher.persons_allowed ? ` · max. ${voucher.persons_allowed} P.` : ''}
                 </p>
               </div>
-              <button type="button" onClick={() => setVoucher(null)} className="text-xs text-muted-foreground hover:text-foreground">Ändern</button>
+              <button type="button" onClick={() => setVoucher(null)} className="text-xs text-muted-foreground hover:text-foreground">
+                Ändern
+              </button>
             </div>
           ) : (
             <div className="flex gap-2">
@@ -120,7 +116,7 @@ export default function RedemptionNew() {
           {voucherError && <p className="text-xs text-destructive">{voucherError}</p>}
         </div>
 
-        {/* Customer */}
+        {/* Customer data */}
         <div className="bg-white rounded-lg border border-border p-6 space-y-4">
           <h2 className="text-sm font-medium">Kundendaten</h2>
           <Field label="Name *">
@@ -147,43 +143,23 @@ export default function RedemptionNew() {
           </Field>
         </div>
 
-        {/* Preferred dates */}
-        <div className="bg-white rounded-lg border border-border p-6 space-y-4">
-          <h2 className="text-sm font-medium">Wunschtermine (bis zu 3)</h2>
-          {[
-            { label: '1. Wunsch', date: date1, time: time1, setDate: setDate1, setTime: setTime1 },
-            { label: '2. Wunsch', date: date2, time: time2, setDate: setDate2, setTime: setTime2 },
-            { label: '3. Wunsch', date: date3, time: time3, setDate: setDate3, setTime: setTime3 },
-          ].map(({ label, date, time, setDate, setTime }) => (
-            <div key={label} className="grid grid-cols-2 gap-3">
-              <Field label={label}>
-                <input type="date" value={date} onChange={e => setDate(e.target.value)} className={inp} />
-              </Field>
-              <Field label="Uhrzeit">
-                <input type="time" value={time} onChange={e => setTime(e.target.value)} className={inp} />
-              </Field>
-            </div>
-          ))}
-        </div>
-
         {/* Message */}
         <div className="bg-white rounded-lg border border-border p-6">
-          <Field label="Nachricht des Kunden">
-            <textarea rows={3} value={message} onChange={e => setMessage(e.target.value)} className={inp} />
+          <Field label="Nachricht des Kunden (optional)">
+            <textarea rows={3} value={message} onChange={e => setMessage(e.target.value)}
+              placeholder="Besondere Wünsche, Anlass, Hinweise..." className={inp} />
           </Field>
         </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
+          <button type="submit" disabled={saving}
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
             {saving ? 'Speichern...' : 'Anfrage speichern'}
           </button>
-          <button type="button" onClick={() => navigate(-1)} className="px-4 py-2 rounded-md text-sm border border-border hover:bg-muted transition-colors">
+          <button type="button" onClick={() => navigate(-1)}
+            className="px-4 py-2 rounded-md text-sm border border-border hover:bg-muted transition-colors">
             Abbrechen
           </button>
         </div>
