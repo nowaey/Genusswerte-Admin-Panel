@@ -6,20 +6,35 @@ import {
   ShoppingBag,
   Ticket,
   CalendarCheck,
-  Users,
   CalendarDays,
   UsersRound,
+  Users,
   LogOut,
 } from 'lucide-react'
 
-const nav = [
-  { to: '/',               label: 'Dashboard',       icon: LayoutDashboard },
-  { to: '/orders',         label: 'Bestellungen',    icon: ShoppingBag },
-  { to: '/vouchers',       label: 'Gutscheine',      icon: Ticket },
-  { to: '/redemptions',    label: 'Einlösungen',     icon: CalendarCheck },
-  { to: '/tastings',       label: 'Termine',         icon: CalendarDays },
-  { to: '/group-requests', label: 'Gruppenanfragen', icon: UsersRound },
-  { to: '/customers',      label: 'Kunden',          icon: Users },
+const groups = [
+  {
+    label: null,
+    items: [
+      { to: '/',        label: 'Dashboard',    icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'Verkauf',
+    items: [
+      { to: '/orders',    label: 'Bestellungen', icon: ShoppingBag },
+      { to: '/vouchers',  label: 'Gutscheine',   icon: Ticket },
+      { to: '/customers', label: 'Kunden',       icon: Users },
+    ],
+  },
+  {
+    label: 'Tastings',
+    items: [
+      { to: '/redemptions',    label: 'Einlösungen',     icon: CalendarCheck },
+      { to: '/tastings',       label: 'Termine',         icon: CalendarDays },
+      { to: '/group-requests', label: 'Gruppenanfragen', icon: UsersRound },
+    ],
+  },
 ]
 
 export default function Sidebar() {
@@ -34,24 +49,35 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {nav.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground font-medium'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-              )
-            }
-          >
-            <Icon className="w-4 h-4 shrink-0" />
-            {label}
-          </NavLink>
+      <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+        {groups.map((group, gi) => (
+          <div key={gi}>
+            {group.label && (
+              <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                {group.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map(({ to, label, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={to === '/'}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors',
+                      isActive
+                        ? 'bg-primary text-primary-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    )
+                  }
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 
