@@ -15,6 +15,7 @@ import RedemptionDetail from '@/pages/RedemptionDetail'
 import Customers from '@/pages/Customers'
 import CustomerDetail from '@/pages/CustomerDetail'
 import StripeTest from '@/pages/StripeTest'
+import RedeemTest from '@/pages/RedeemTest'
 import Tastings from '@/pages/Tastings'
 import TastingNew from '@/pages/TastingNew'
 import TastingDetail from '@/pages/TastingDetail'
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="customers"            element={<Customers />} />
             <Route path="customers/:id"        element={<CustomerDetail />} />
             <Route path="stripe-test"          element={<StripeTest />} />
+            <Route path="redeem-test"          element={<RedeemTest />} />
             <Route path="tastings"             element={<Tastings />} />
             <Route path="tastings/new"         element={<TastingNew />} />
             <Route path="tastings/:id"         element={<TastingDetail />} />
