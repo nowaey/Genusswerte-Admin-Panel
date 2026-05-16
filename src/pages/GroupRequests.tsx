@@ -46,9 +46,11 @@ export default function GroupRequests() {
             <thead className="bg-muted/50 border-b border-border">
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Eingegangen</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Tasting</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Kunde</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Tasting</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Personen</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">Zeitraum</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden lg:table-cell">Anlass</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
               </tr>
             </thead>
@@ -59,12 +61,18 @@ export default function GroupRequests() {
                   onClick={() => navigate(`/group-requests/${r.id}`)}
                   className="hover:bg-muted/30 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 text-muted-foreground tabular-nums">
+                  <td className="px-4 py-3 text-muted-foreground tabular-nums text-xs">
                     {new Date(r.created_at).toLocaleDateString('de-DE')}
                   </td>
-                  <td className="px-4 py-3">{r.tasting_name}</td>
                   <td className="px-4 py-3 font-medium">{r.customer_name}</td>
+                  <td className="px-4 py-3">{r.tasting_name}</td>
                   <td className="px-4 py-3">{r.persons}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-sm hidden md:table-cell">
+                    {r.desired_period ?? '—'}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-sm hidden lg:table-cell">
+                    {r.occasion ?? '—'}
+                  </td>
                   <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
                 </tr>
               ))}

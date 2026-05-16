@@ -194,8 +194,8 @@ export default function Tastings() {
                         <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                           <div className={`h-full ${barColor} rounded-full`} style={{ width: `${Math.min(pct, 100)}%` }} />
                         </div>
-                        <span className={e.own_available <= 0 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
-                          {e.own_available} / {e.own_quota} frei
+                        <span className={`text-xs tabular-nums ${e.own_available <= 0 ? 'text-red-600 font-medium' : e.own_available <= 2 ? 'text-amber-600 font-medium' : 'text-muted-foreground'}`}>
+                          {e.own_booked} belegt · <span className="font-semibold">{e.own_available} frei</span> · {e.own_quota} ges.
                         </span>
                       </div>
                     </td>

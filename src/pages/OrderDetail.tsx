@@ -82,31 +82,47 @@ export default function OrderDetail() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-4">
+        {/* Primary action — the single most important next step */}
+        <div className="mt-4 space-y-3">
           {order.payment_status === 'open' && (
-            <ActionButton onClick={markAsPaid} variant="primary">
+            <ActionButton onClick={markAsPaid} variant="primary" fullWidth>
               Als bezahlt markieren
             </ActionButton>
           )}
-          {order.status === 'inquiry' && (
-            <ActionButton onClick={() => setStatus('payment_open')}>Zahlung abwarten</ActionButton>
-          )}
-          {order.status === 'paid' && order.order_type !== 'tasting_voucher' && order.order_type !== 'value_voucher' && (
-            <ActionButton onClick={() => setStatus('in_preparation')}>In Vorbereitung</ActionButton>
+          {order.status === 'paid' && !['tasting_voucher','value_voucher'].includes(order.order_type) && order.payment_status === 'paid' && (
+            <ActionButton onClick={() => setStatus('in_preparation')} variant="primary" fullWidth>
+              In Vorbereitung setzen
+            </ActionButton>
           )}
           {order.status === 'in_preparation' && (
-            <ActionButton onClick={() => setStatus('ready')}>Bereit</ActionButton>
+            <ActionButton onClick={() => setStatus('ready')} variant="primary" fullWidth>
+              Als bereit markieren
+            </ActionButton>
           )}
-          {(order.status === 'ready' || order.status === 'paid') && (
-            <ActionButton onClick={() => setStatus('completed')}>Abschließen</ActionButton>
+          {order.status === 'ready' && (
+            <ActionButton onClick={() => setStatus('completed')} variant="primary" fullWidth>
+              Abschließen
+            </ActionButton>
           )}
+
+          {/* Secondary workflow actions */}
+          <div className="flex flex-wrap gap-2">
+            {order.status === 'inquiry' && (
+              <ActionButton onClick={() => setStatus('payment_open')}>Zahlung abwarten</ActionButton>
+            )}
+            {order.status === 'paid' && order.payment_status === 'paid' && (
+              <ActionButton onClick={() => setStatus('completed')}>Direkt abschließen</ActionButton>
+            )}
+          </div>
+
+          {/* Danger zone */}
           {!['cancelled','refunded','completed'].includes(order.status) && (
-            <>
+            <div className="flex flex-wrap gap-2 pt-3 border-t border-border">
               <ActionButton onClick={() => setPaymentStatus('cancelled')} variant="danger">Stornieren</ActionButton>
               {order.payment_status === 'paid' && (
                 <ActionButton onClick={() => setPaymentStatus('refunded')} variant="danger">Erstatten</ActionButton>
               )}
-            </>
+            </div>
           )}
         </div>
 
@@ -197,20 +213,23 @@ function InfoRow({ label, children, className }: { label: string; children: Reac
   )
 }
 
-function ActionButton({ onClick, children, variant = 'default' }: {
+function ActionButton({ onClick, children, variant = 'default', fullWidth }: {
   onClick: () => void
   children: React.ReactNode
   variant?: 'default' | 'primary' | 'danger'
+  fullWidth?: boolean
 }) {
   const styles = {
-    default:  'border border-border hover:bg-muted',
-    primary:  'bg-primary text-primary-foreground hover:bg-primary/90',
-    danger:   'border border-red-200 text-red-600 hover:bg-red-50',
+    default: 'border border-border hover:bg-muted text-foreground',
+    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    danger:  'border border-red-200 text-red-600 hover:bg-red-50',
   }
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${styles[variant]}`}
+      className={`rounded-md text-sm font-medium transition-colors ${
+        fullWidth ? 'w-full py-2.5 px-4' : 'px-3 py-1.5'
+      } ${styles[variant]}`}
     >
       {children}
     </button>

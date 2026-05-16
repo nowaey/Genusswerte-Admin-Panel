@@ -72,10 +72,10 @@ export default function Vouchers() {
             <thead className="bg-muted/50 border-b border-border">
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Code</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Produkt</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Variante</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Produkt · Variante</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">Bestellung</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">Gültig bis</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden lg:table-cell">Gültig bis</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -88,10 +88,15 @@ export default function Vouchers() {
                   <td className="px-4 py-3 font-mono text-xs">
                     {v.code ?? <span className="text-muted-foreground italic">—</span>}
                   </td>
-                  <td className="px-4 py-3">{v.product_name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{v.variant ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className="font-medium">{v.product_name}</span>
+                    {v.variant && <span className="text-muted-foreground text-xs ml-1.5">· {v.variant}</span>}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">
+                    {v.orders?.internal_ref ?? v.orders?.id?.slice(0, 8) ?? '—'}
+                  </td>
                   <td className="px-4 py-3"><StatusBadge status={v.status} /></td>
-                  <td className="px-4 py-3 text-muted-foreground">
+                  <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
                     {v.valid_until ? new Date(v.valid_until).toLocaleDateString('de-DE') : '—'}
                   </td>
                 </tr>
