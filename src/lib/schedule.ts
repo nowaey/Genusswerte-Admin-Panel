@@ -97,7 +97,12 @@ function getNthSaturdayOfMonth(year: number, month: number, nth: number): Date {
 }
 
 function toDateStr(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  // Use local date components — toISOString() converts to UTC which causes off-by-one
+  // errors in timezones east of UTC (e.g. CEST = UTC+2, midnight local = 22:00 UTC prev day).
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 export function generateEvents(months: number): GeneratedEvent[] {
